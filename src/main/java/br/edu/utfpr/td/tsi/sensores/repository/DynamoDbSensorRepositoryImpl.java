@@ -1,7 +1,5 @@
 package br.edu.utfpr.td.tsi.sensores.repository;
 
-import br.edu.utfpr.td.tsi.sensores.exception.SensorAlreadyRegisteredException;
-import br.edu.utfpr.td.tsi.sensores.exception.SensorNotRegisteredException;
 import br.edu.utfpr.td.tsi.sensores.model.Sensor;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.*;
@@ -14,7 +12,7 @@ import java.net.URI;
 import java.util.List;
 
 @Repository
-public class DynamoDBSensorRepositoryImpl implements SensorRepository {
+public class DynamoDbSensorRepositoryImpl implements SensorRepository {
 
     private final String tableName = "SensoresToledo";
     private final String localizacaoIndexName = "LocalizacaoIndex";
@@ -23,7 +21,7 @@ public class DynamoDBSensorRepositoryImpl implements SensorRepository {
     private final DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoDbClient).build();
     private final DynamoDbTable<Sensor> sensorTable = enhancedClient.table(tableName, TableSchema.fromBean(Sensor.class));
 
-    DynamoDBSensorRepositoryImpl() {
+    DynamoDbSensorRepositoryImpl() {
         try {
             dynamoDbClient.describeTable(b -> b.tableName(tableName));
         } catch (ResourceNotFoundException e) {
@@ -32,24 +30,18 @@ public class DynamoDBSensorRepositoryImpl implements SensorRepository {
         }
     }
 
-    private boolean exists(Sensor sensor) {
+    public boolean exists(Sensor sensor) {
         return sensorTable.getItem(sensor) != null;
     }
 
     @Override
-    public Sensor insert(Sensor sensor) throws SensorAlreadyRegisteredException {
-        if (exists(sensor)) {
-            throw new SensorAlreadyRegisteredException("Sensor já registrado. Sensor:  " + sensor);
-        }
+    public Sensor insert(Sensor sensor) {
         return sensorTable.updateItem(sensor);
     }
 
     @Override
-    public Sensor update(Sensor sensor) throws SensorNotRegisteredException {
-        if (exists(sensor)) {
-            return sensorTable.updateItem(sensor);
-        }
-        throw new SensorNotRegisteredException("Sensor não registrado. Sensor: " + sensor);
+    public Sensor update(Sensor sensor) {
+        return sensorTable.updateItem(sensor);
     }
 
     @Override

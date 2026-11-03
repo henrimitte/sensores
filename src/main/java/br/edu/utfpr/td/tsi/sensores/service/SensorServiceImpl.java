@@ -21,12 +21,18 @@ public class SensorServiceImpl implements SensorService {
 
     @Override
     public Sensor insert(Sensor sensor) throws SensorAlreadyRegisteredException {
+        if (sensorRepository.exists(sensor)) {
+            throw new SensorAlreadyRegisteredException("Sensor já registrado. Sensor:  " + sensor);
+        }
         return sensorRepository.insert(sensor);
     }
 
     @Override
     public Sensor update(Sensor sensor) throws SensorNotRegisteredException {
-        return sensorRepository.update(sensor);
+        if (sensorRepository.exists(sensor)) {
+            return sensorRepository.update(sensor);
+        }
+        throw new SensorNotRegisteredException("Sensor não registrado. Sensor: " + sensor);
     }
 
     @Override
