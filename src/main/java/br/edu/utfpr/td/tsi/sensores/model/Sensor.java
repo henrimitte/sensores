@@ -32,7 +32,6 @@ public class Sensor {
         this.timestamp = timestamp;
     }
 
-    @DynamoDbSecondarySortKey(indexNames = {"TemperaturaIndex"})
     @DynamoDbAttribute("Temperatura")
     public double getTemperatura() {
         return temperatura;
